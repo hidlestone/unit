@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.rbac.mapper.MenuMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.rbac.entity.Menu">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="level" jdbcType="TINYINT" property="level"/>
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode"/>
+        <result column="menu_name" jdbcType="VARCHAR" property="menuName"/>
+        <result column="menu_desc" jdbcType="VARCHAR" property="menuDesc"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="func_link" jdbcType="VARCHAR" property="funcLink"/>
+        <result column="open_type" jdbcType="TINYINT" property="openType"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="order" jdbcType="TINYINT" property="order"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+
+    <!-- 菜单递归查询 -->
+    <resultMap id="TreeResultMap" type="com.wordplay.unit.starter.rbac.entity.Menu">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="level" jdbcType="TINYINT" property="level"/>
+        <result column="menu_code" jdbcType="VARCHAR" property="menuCode"/>
+        <result column="menu_name" jdbcType="VARCHAR" property="menuName"/>
+        <result column="menu_desc" jdbcType="VARCHAR" property="menuDesc"/>
+        <result column="path" jdbcType="VARCHAR" property="path"/>
+        <result column="func_link" jdbcType="VARCHAR" property="funcLink"/>
+        <result column="open_type" jdbcType="TINYINT" property="openType"/>
+        <result column="icon" jdbcType="VARCHAR" property="icon"/>
+        <result column="order" jdbcType="TINYINT" property="order"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <collection property="children" ofType="com.wordplay.unit.starter.rbac.entity.Menu" column="id"
+                    select="getMenusByParentId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, parent_id, `level`, menu_code, menu_name, menu_desc, path, func_link, open_type, icon, `order`,
+        remark, `status`, create_user_id, modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from s_menu
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.parentId != null">
+                AND parent_id = #{param2.parentId,jdbcType=BIGINT}
+            </if>
+            <if test="param2.level != null">
+                AND `level` = #{param2.level,jdbcType=TINYINT}
+            </if>
+            <if test="param2.menuCode != null">
+                AND menu_code LIKE CONCAT('%', #{param2.menuCode,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.menuName != null">
+                AND menu_name LIKE CONCAT('%', #{param2.menuName,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.menuDesc != null">
+                AND menu_desc LIKE CONCAT('%', #{param2.menuDesc,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.path != null">
+                AND path LIKE CONCAT('%', #{param2.path,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.funcLink != null">
+                AND func_link LIKE CONCAT('%', #{param2.funcLink,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.openType != null">
+                AND open_type = #{param2.openType,jdbcType=TINYINT}
+            </if>
+            <if test="param2.icon != null">
+                AND icon LIKE CONCAT('%', #{param2.icon,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.order != null">
+                AND order = #{param2.order,jdbcType=TINYINT}
+            </if>
+            <if test="param2.remark != null">
+                AND remark LIKE CONCAT('%', #{param2.remark,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.status != null">
+                AND `status` = #{param2.status,jdbcType=TINYINT}
+            </if>
+            <!-- 用户ID -->
+            <if test="param2.userId != null">
+                AND id IN (
+                SELECT
+                DISTINCT menu_id
+                FROM
+                s_role_menu
+                WHERE
+                role_id IN (
+                SELECT
+                role_id
+                FROM
+                s_user_role
+                WHERE
+                user_id = #{param2.userId,jdbcType=BIGINT}
+                )
+                )
+            </if>
+            <!-- roleIds -->
+            <if test="param2.roleIds != null and param2.roleIds.size() > 0">
+                AND id IN (
+                SELECT
+                DISTINCT menu_id
+                FROM
+                s_role_menu
+                WHERE
+                role_id IN
+                <foreach collection="param2" item="item" index="index" open="(" separator="," close=")">
+                    #{param2.item,jdbcType=VARCHAR}
+                </foreach>
+                )
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.sysparam.mapper.DictMapper.Common_Column_Filter"/>
+        </where>
+        ORDER BY `order` ASC
+    </select>
+
+    <select id="getAllMenusByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_menu
+        WHERE
+        id IN (
+        SELECT
+        DISTINCT menu_id
+        FROM
+        s_role_menu
+        WHERE
+        role_id IN (
+        SELECT
+        role_id
+        FROM
+        s_user_role
+        WHERE
+        user_id = #{userId,jdbcType=BIGINT}
+        )
+        )
+        ORDER BY `order` ASC
+    </select>
+
+    <select id="getMenuTree" resultMap="TreeResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_menu
+        WHERE
+        parent_id IS NULL
+        <if test="userId != null">
+            AND id IN (
+            SELECT
+            DISTINCT menu_id
+            FROM
+            s_role_menu
+            WHERE
+            role_id IN (
+            SELECT
+            role_id
+            FROM
+            s_user_role
+            WHERE
+            user_id = #{userId,jdbcType=BIGINT}
+            )
+            )
+        </if>
+        <if test="roleIds != null">
+            AND id IN (
+            SELECT
+            DISTINCT menu_id
+            FROM
+            s_role_menu
+            WHERE
+            role_id IN
+            <foreach collection="roleIds" item="item" index="index" open="(" separator="," close=")">
+                #{item,jdbcType=VARCHAR}
+            </foreach>
+            )
+        </if>
+        ORDER BY `order` ASC
+    </select>
+
+    <select id="getMenusByParentId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_menu
+        WHERE
+        parent_id = #{id,jdbcType=BIGINT}
+        ORDER BY `order` ASC
+    </select>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.mail.mapper.MailTemplateMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.mail.entity.MailTemplate">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="from" jdbcType="VARCHAR" property="from"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="file_group_id" jdbcType="BIGINT" property="fileGroupId"/>
+        <result column="retry_count" jdbcType="TINYINT" property="retryCount"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, code, `desc`, title, `from`, content, file_group_id, retry_count, create_user_id,
+        modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from
+        s_mail_template
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT},
+            </if>
+            <if test="param2.code != null">
+                AND code LIKE CONCAT('%', #{param2.code,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.desc != null">
+                AND `desc` LIKE CONCAT('%', #{param2.desc,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.title != null">
+                AND title LIKE CONCAT('%', #{param2.title,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.from != null">
+                AND `from` LIKE CONCAT('%', #{param2.from,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.content != null">
+                AND content LIKE CONCAT('%', #{param2.content,jdbcType=LONGVARCHAR}, '%')
+            </if>
+            <if test="param2.fileGroupId != null">
+                AND file_group_id = #{param2.fileGroupId,jdbcType=BIGINT},
+            </if>
+            <if test="param2.retryCount != null">
+                AND retry_count = #{param2.retryCount,jdbcType=BOOLEAN},
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER by id DESC
+    </select>
+
+</mapper>

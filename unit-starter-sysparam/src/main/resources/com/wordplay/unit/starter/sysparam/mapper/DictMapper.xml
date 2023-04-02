@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.sysparam.mapper.DictMapper">
+	<resultMap id="BaseResultMap" type="com.wordplay.unit.starter.sysparam.entity.Dict">
+		<!--@mbg.generated-->
+		<id column="id" jdbcType="BIGINT" property="id"/>
+		<result column="code" jdbcType="VARCHAR" property="code"/>
+		<result column="value" jdbcType="VARCHAR" property="value"/>
+		<result column="desc" jdbcType="VARCHAR" property="desc"/>
+		<result column="status" jdbcType="BOOLEAN" property="status"/>
+		<result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+		<result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+		<result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+		<result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		<!--@mbg.generated-->
+		id, code, `value`, `desc`, `status`, create_user_id, modify_user_id, gmt_create, gmt_modified
+	</sql>
+
+	<!-- 基础字段过滤 -->
+	<sql id="Common_Column_Filter">
+		<if test="param2.createUserId != null">
+			AND create_user_id = #{param2.createUserId,jdbcType=BIGINT}
+		</if>
+		<if test="param2.modifyUserId != null">
+			AND modify_user_id = #{param2.modifyUserId,jdbcType=BIGINT}
+		</if>
+		<if test="param2.gmtCreate != null">
+			AND gmt_create = #{param2.gmtCreate,jdbcType=TIMESTAMP}
+		</if>
+		<if test="param2.gmtModified != null">
+			AND gmt_modified = #{param2.gmtModified,jdbcType=TIMESTAMP}
+		</if>
+		<!-- 创建时间范围 -->
+		<if test="param2.gmtCreateStart != null">
+			AND gmt_create &gt;= #{param2.gmtCreateStart, jdbcType=TIMESTAMP}
+		</if>
+		<if test="param2.gmtCreateEnd != null">
+			AND gmt_create &lt;= #{param2.gmtCreateEnd, jdbcType=TIMESTAMP}
+		</if>
+		<!-- 修改时间范围 -->
+		<if test="param2.gmtModifiedStart != null">
+			AND gmt_modified &gt;= #{param2.gmtModifiedStart, jdbcType=TIMESTAMP}
+		</if>
+		<if test="param2.gmtModifiedEnd != null">
+			AND gmt_modified &lt;= #{param2.gmtModifiedEnd, jdbcType=TIMESTAMP}
+		</if>
+	</sql>
+	
+	<select id="page" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM
+		s_dict
+		<where>
+			<if test="param2.id != null">
+				id = #{param2.id,jdbcType=BIGINT},
+			</if>
+			<if test="param2.code != null">
+				AND code like CONCAT('%', #{param2.code,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.value != null">
+				AND `value` like CONCAT('%', #{param2.value,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.desc != null">
+				AND `desc` LIKE CONCAT('%', #{param2.desc,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.status != null">
+				AND `status` = #{param2.status,jdbcType=TINYINT}
+			</if>
+			<!-- 基础字段过滤 -->
+			<include refid="Common_Column_Filter"/>
+		</where>
+		ORDER by id DESC
+	</select>
+
+</mapper>

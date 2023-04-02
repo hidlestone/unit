@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.file.mapper.FileInfoMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.file.entity.FileInfo">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="nonsense_name" jdbcType="VARCHAR" property="nonsenseName"/>
+        <result column="extension" jdbcType="VARCHAR" property="extension"/>
+        <result column="storage_type" jdbcType="TINYINT" property="storageType"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, `name`, nonsense_name, extension, storage_type, url, `status`, create_user_id,
+        modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_file_info
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.name != null">
+                AND `name` LIKE CONCAT('%', #{param2.name,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.nonsenseName != null">
+                AND nonsense_name LIKE CONCAT('%', #{param2.nonsenseName,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.extension != null">
+                AND extension LIKE CONCAT('%', #{param2.extension,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.storageType != null">
+                AND storage_type = #{param2.storageType,jdbcType=VARCHAR}
+            </if>
+            <if test="param2.url != null">
+                AND url LIKE CONCAT('%', #{param2.url,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.status != null">
+                AND `status` = #{param2.status,jdbcType=TINYINT}
+            </if>
+            <if test="param2.fileGroupId != null">
+                AND fileGroupId = #{param2.fileGroupId,jdbcType=BIGINT}
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER by id DESC
+    </select>
+
+</mapper>

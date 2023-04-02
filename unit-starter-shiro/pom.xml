@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>unit-starters</artifactId>
+        <groupId>com.wordplay.unit</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../unit-starters/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>unit-starter-shiro</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>unit-starter-shiro</name>
+    <description>unit-starter-shiro</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-rbac</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-sysparam</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-cache-ehcache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>

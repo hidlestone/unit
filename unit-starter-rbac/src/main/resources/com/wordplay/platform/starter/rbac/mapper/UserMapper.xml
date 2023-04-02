@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.rbac.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.rbac.entity.User">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="account" jdbcType="VARCHAR" property="account"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="id_card" jdbcType="VARCHAR" property="idCard"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="sex" jdbcType="TINYINT" property="sex"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="source_type" jdbcType="TINYINT" property="sourceType"/>
+        <result column="last_login_time" jdbcType="TIMESTAMP" property="lastLoginTime"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, account, `password`, username, avatar, tel, email, id_card, `name`, birthday,
+        address, sex, `status`, remark, source_type, last_login_time, create_user_id, modify_user_id,
+        gmt_create, gmt_modified
+    </sql>
+    <!-- 可以展示的字段 -->
+    <sql id="Show_Column_List">
+		id, account, username, avatar, tel, email, id_card, `name`, birthday,
+		address, sex, `status`, remark, source_type, last_login_time, create_user_id, modify_user_id,
+		gmt_create, gmt_modified
+	</sql>
+
+    <select id="list" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Show_Column_List"/>
+        FROM
+        s_user
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.account != null">
+                AND account LIKE CONCAT('%', #{param2.account,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.username != null">
+                AND username LIKE CONCAT('%', #{param2.username,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.avatar != null">
+                AND avatar LIKE CONCAT('%', #{param2.avatar,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.tel != null">
+                AND tel LIKE CONCAT('%', #{param2.tel,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.email != null">
+                AND email LIKE CONCAT('%', #{param2.email,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.idCard != null">
+                AND id_card LIKE CONCAT('%', #{param2.idCard,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.name != null">
+                AND name LIKE CONCAT('%', #{param2.name,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.address != null">
+                AND address LIKE CONCAT('%', #{param2.address,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.sex != null">
+                AND sex = #{param2.sex,jdbcType=TINYINT}
+            </if>
+            <if test="param2.status != null">
+                AND status = #{param2.status,jdbcType=TINYINT}
+            </if>
+            <if test="param2.remark != null">
+                AND remark LIKE CONCAT('%', #{param2.remark,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.sourceType != null">
+                AND source_type = #{param2.sourceType,jdbcType=TINYINT}
+            </if>
+            <if test="param2.lastLoginTime != null">
+                AND #{param2.lastLoginTime,jdbcType=TIMESTAMP}
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.sysparam.mapper.SysParamGroupMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.sysparam.entity.SysParamGroup">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
+        <result column="desc" jdbcType="VARCHAR" property="desc" />
+        <result column="status" jdbcType="BOOLEAN" property="status" />
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId" />
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId" />
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    </resultMap>
+    
+    <resultMap id="BaseResultMapRecursion" type="com.wordplay.unit.starter.sysparam.entity.SysParamGroup">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <!-- 配置一对多的关系 -->
+        <collection property="sysParamItems" javaType="list" ofType="com.wordplay.unit.starter.sysparam.entity.SysParamItem">
+            <!-- 配置主键，是关联Order的唯一标识 -->
+            <!-- 这里的column对应的是下面查询的别名，而不是表字段名 -->
+            <id column="tid" jdbcType="BIGINT" property="id"/>
+            <result column="tcode" jdbcType="VARCHAR" property="code"/>
+            <result column="tvalue" jdbcType="VARCHAR" property="value"/>
+            <result column="encrypted_value" jdbcType="VARCHAR" property="encryptedValue"/>
+            <result column="tdesc" jdbcType="VARCHAR" property="desc"/>
+            <result column="tstatus" jdbcType="TINYINT" property="status"/>
+            <result column="group_code" jdbcType="VARCHAR" property="groupCode"/>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, code, `desc`, `status`, create_user_id, modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <!-- 基础字段过滤 -->
+    <sql id="Common_Column_Filter">
+        <if test="param2.createUserId != null">
+            AND sgroup.create_user_id = #{param2.createUserId,jdbcType=BIGINT}
+        </if>
+        <if test="param2.modifyUserId != null">
+            AND sgroup.modify_user_id = #{param2.modifyUserId,jdbcType=BIGINT}
+        </if>
+        <if test="param2.gmtCreate != null">
+            AND sgroup.gmt_create = #{param2.gmtCreate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="param2.gmtModified != null">
+            AND sgroup.gmt_modified = #{param2.gmtModified,jdbcType=TIMESTAMP}
+        </if>
+        <!-- 创建时间范围 -->
+        <if test="param2.gmtCreateStart != null">
+            AND sgroup.gmt_create &gt;= #{param2.gmtCreateStart, jdbcType=TIMESTAMP}
+        </if>
+        <if test="param2.gmtCreateEnd != null">
+            AND sgroup.gmt_create &lt;= #{param2.gmtCreateEnd, jdbcType=TIMESTAMP}
+        </if>
+        <!-- 修改时间范围 -->
+        <if test="param2.gmtModifiedStart != null">
+            AND sgroup.gmt_modified &gt;= #{param2.gmtModifiedStart, jdbcType=TIMESTAMP}
+        </if>
+        <if test="param2.gmtModifiedEnd != null">
+            AND sgroup.gmt_modified &lt;= #{param2.gmtModifiedEnd, jdbcType=TIMESTAMP}
+        </if>
+    </sql>
+
+    <select id="getAllSysParamGroup" resultMap="BaseResultMapRecursion">
+        SELECT
+            sgroup.id,
+            sgroup.`code`,
+            sgroup.`desc`,
+            sgroup.`status`,
+            sitem.id AS tid,
+            sitem.`code` AS tcode,
+            sitem.`value` AS tvalue,
+            sitem.encrypted_value AS encrypted_value,
+            sitem.`desc` AS tdesc,
+            sitem.`status` AS tstatus,
+            sitem.group_code
+        FROM
+            s_sys_param_group sgroup
+        LEFT JOIN s_sys_param_item sitem ON sitem.group_code = sgroup.`code`
+    </select>
+
+    <select id="page" resultMap="BaseResultMapRecursion">
+        SELECT
+            sgroup.id,
+            sgroup.`code`,
+            sgroup.`desc`,
+            sgroup.`status`,
+            sitem.id AS tid,
+            sitem.`code` AS tcode,
+            sitem.`value` AS tvalue,
+            sitem.encrypted_value as encrypted_value,
+            sitem.`desc` AS tdesc,
+            sitem.`status` AS tstatus,
+            sitem.group_code
+        FROM
+            s_sys_param_group sgroup
+        LEFT JOIN s_sys_param_item sitem ON sitem.group_code = sgroup.`code`
+        <where>
+            <if test="param2.id != null">
+                sgroup.id LIKE CONCAT('%', #{param2.id,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.code != null">
+                AND sgroup.`code` LIKE CONCAT('%', #{param2.code,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.desc != null">
+                AND sgroup.`desc` LIKE CONCAT('%', #{param2.desc,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.status != null">
+                AND sgroup.`status` = #{param2.status,jdbcType=TINYINT},
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="Common_Column_Filter"/>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+</mapper>

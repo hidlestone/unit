@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.rbac.mapper.PermissionMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.rbac.entity.Permission">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="permission_code" jdbcType="VARCHAR" property="permissionCode"/>
+        <result column="permission_name" jdbcType="VARCHAR" property="permissionName"/>
+        <result column="resource_value" jdbcType="VARCHAR" property="resourceValue"/>
+        <result column="order_num" jdbcType="INTEGER" property="orderNum"/>
+        <result column="authc_type" jdbcType="TINYINT" property="authcType"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, permission_code, permission_name, resource_value, order_num, authc_type, create_user_id,
+        modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="selectAllRolePermission" resultType="com.wordplay.unit.starter.rbac.entity.Role">
+		SELECT
+			r.id AS id,
+			r.role_code AS roleCode,
+			p.permission_code AS permissionCode,
+			p.resource_value AS resourceValue,
+			p.authc_type AS authcType
+		FROM
+			s_role_permission rp
+		LEFT JOIN s_role r ON r.id = rp.role_id
+		LEFT JOIN s_permission p ON p.id = rp.permission_id
+		WHERE
+			r.role_code IS NOT NULL	
+	</select>
+
+    <select id="getPermissionListByUserId" resultType="com.wordplay.unit.starter.rbac.entity.Permission"
+            parameterType="long">
+		SELECT
+			resource_value AS resourceValue,
+			authc_type AS authcType
+		FROM
+			s_permission
+		WHERE
+			id IN (
+				SELECT DISTINCT
+					(permission_id)
+				FROM
+					s_role_permission
+				WHERE
+					role_id IN (
+						SELECT
+							role_id
+						FROM
+							s_user_role
+						WHERE
+							user_id = #{id,jdbcType=BIGINT} 
+					)
+			)
+	</select>
+
+    <select id="list" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from s_permission
+        <where>
+            <if test="param2.id != null">
+                id = #{id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.permissionCode != null">
+                AND permission_code LIKE CONCAT('%', #{param2.permissionCode,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.permissionName != null">
+                AND permission_name LIKE CONCAT('%', #{param2.permissionName,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.resourceValue != null">
+                AND resource_value LIKE CONCAT('%', #{param2.resourceValue,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.orderNum != null">
+                AND order_num = #{param2.orderNum,jdbcType=INTEGER}
+            </if>
+            <if test="param2.authcType != null">
+                AND authc_type = #{param2.authcType,jdbcType=TINYINT}
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER BY gmt_create DESC
+    </select>
+
+</mapper>

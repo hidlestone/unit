@@ -18,6 +18,32 @@
     <modules>
         <module>../unit-starter-data-mp</module>
         <module>../unit-starter-api-dependency</module>
+        <module>../unit-starter-sysparam</module>
+        <module>../unit-starter-util</module>
+        <module>../unit-starter-cache-simple</module>
+        <module>../unit-starter-cache-ehcache</module>
+        <module>../unit-starter-cache-redis</module>
+        <module>../unit-starter-rbac</module>
+        <module>../unit-starter-data-jpa</module>
+        <module>../unit-starter-i18n</module>
+        <module>../unit-starter-file</module>
+        <module>../unit-starter-easy-es</module>
+        <module>../unit-starter-mail</module>
+        <module>../unit-starter-mq</module>
+        <module>../unit-starter-easy-excel</module>
+        <module>../unit-starter-httpClient</module>
+        <module>../unit-starter-file-tencentcos</module>
+        <module>../unit-starter-sms</module>
+        <module>../unit-starter-task</module>
+        <module>../unit-starter-mq-rabbit</module>
+        <module>../unit-starter-logback</module>
+        <module>../unit-starter-drools</module>
+        <module>../unit-starter-task-quartz</module>
+        <module>../unit-starter-ureport</module>
+        <module>../unit-starter-shiro</module>
+        <module>../unit-starter-cache-mongodb</module>
+        <module>../unit-starter-control-dependency</module>
+        <module>../unit-starter-sms-aliyun</module>
     </modules>
 
 </project>

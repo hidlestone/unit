@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.sms.mapper.SmsConfigMapper">
+	<resultMap id="BaseResultMap" type="com.wordplay.unit.starter.sms.entity.SmsConfig">
+		<!--@mbg.generated-->
+		<id column="id" jdbcType="BIGINT" property="id"/>
+		<result column="product_type" jdbcType="VARCHAR" property="productType"/>
+		<result column="region_id" jdbcType="VARCHAR" property="regionId"/>
+		<result column="access_key_id" jdbcType="VARCHAR" property="accessKeyId"/>
+		<result column="access_key_secret" jdbcType="VARCHAR" property="accessKeySecret"/>
+		<result column="properties" jdbcType="LONGVARCHAR" property="properties"/>
+		<result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+		<result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+		<result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+		<result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		<!--@mbg.generated-->
+		id, product_type, region_id, access_key_id, access_key_secret, properties, create_user_id,
+		modify_user_id, gmt_create, gmt_modified
+	</sql>
+
+	<select id="list" resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List"/>
+		FROM
+		s_sms_config
+		<where>
+			<if test="param2.id != null">
+				id = #{param2.id,jdbcType=BIGINT},
+			</if>
+			<if test="param2.productType != null and param2.productType != ''">
+				AND product_type = #{param2.productType,jdbcType=VARCHAR}
+			</if>
+			<if test="param2.regionId != null and param2.regionId != ''">
+				AND region_id = #{param2.regionId,jdbcType=VARCHAR}
+			</if>
+			<if test="param2.accessKeyId != null and param2.accessKeyId != ''">
+				AND accessKeyId LIKE CONCAT('%', #{param2.accessKeyId,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.accessKeySecret != null and param2.accessKeySecret != ''">
+				AND access_key_secret LIKE CONCAT('%', #{param2.accessKeySecret,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.properties != null and param2.properties != ''">
+				AND properties LIKE CONCAT('%', #{param2.properties,jdbcType=VARCHAR}, '%')
+			</if>
+			<!-- 基础字段过滤 -->
+			<include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+		</where>
+		ORDER by id DESC
+	</select>
+
+</mapper>

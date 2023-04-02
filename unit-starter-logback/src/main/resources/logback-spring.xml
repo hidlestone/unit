@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+    <!-- 从Spring上下文中获取配置属性 -->
+    <!-- 应用名称 -->
+    <springProperty name="application.name" source="spring.application.name"/>
+    <!-- 日志保存路径 -->
+    <springProperty name="filePath" source="platform.starter.logback.filePath"/>
+    <springProperty name="mapper" source="platform.starter.logback.mapper"/>
+    <!-- 日志保存路径 : /deploy/log/${application.name} -->
+    <property name="LOG_HOME" value="${filePath:-/deploy/log}/${application.name}"/>
+
+    <!-- 控制台输出 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %L - %msg %ex%n</pattern>
+        </encoder>
+        <!-- 过滤MP-SQL语句，统一由logger节点控制 -->
+        <filter class="com.wordplay.unit.starter.logback.filter.MpSQLLoggerFilter"/>
+    </appender>
+
+    <!-- 按照每天生成日志文件 -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${application.name}.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <!-- 日志文件保留天数 -->
+            <maxHistory>30</maxHistory>
+            <!-- 日志文件最大大小 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 最多占用多少空间 -->
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %L - %msg %ex%n</pattern>
+        </encoder>
+        <!-- 过滤MP-SQL语句，使其仅输出到sql-history.log中 -->
+        <filter class="com.wordplay.unit.starter.logback.filter.MpSQLLoggerFilter"/>
+    </appender>
+
+    <!-- Mybatis日志与主日志分开 -->
+    <appender name="mp" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/${application.name}-sql-history.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <!-- 日志文件保留天数 -->
+            <maxHistory>30</maxHistory>
+            <!-- 日志文件最大大小 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 最多占用多少空间 -->
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %L - %msg%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <logger name="${mapper}" level="DEBUG" additivity="false">
+        <appender-ref ref="mp"/>
+    </logger>
+
+    <!-- MQ日志与主日志分开 -->
+    <appender name="mq" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/mq.%d{yyyy-MM-dd}-%i.log</FileNamePattern>
+            <!-- 日志文件保留天数 -->
+            <maxHistory>30</maxHistory>
+            <!-- 日志文件最大大小 -->
+            <maxFileSize>10MB</maxFileSize>
+            <!-- 最多占用多少空间 -->
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!-- 格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %L - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="MQLogger" level="INFO">
+        <appender-ref ref="mq"/>
+    </logger>
+
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <!--<appender-ref ref="stdout"/>-->
+        <appender-ref ref="file"/>
+    </root>
+
+</configuration>

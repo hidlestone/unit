@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.rbac.mapper.DepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.rbac.entity.Department">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="order" jdbcType="TINYINT" property="order"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+
+    <resultMap id="TreeResultMap" type="com.wordplay.unit.starter.rbac.entity.Department">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="order" jdbcType="TINYINT" property="order"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+        <collection property="children" ofType="com.wordplay.unit.starter.rbac.entity.Menu" column="id"
+                    select="getDepartmentsByParentId"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, parent_id, code, `name`, `desc`, `order`, `status`, create_user_id, modify_user_id, gmt_create,
+        gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from s_department
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.parentId != null">
+                AND parent_id = #{param2.parentId,jdbcType=BIGINT}
+            </if>
+            <if test="param2.code != null">
+                AND `code` LIKE CONCAT('%', #{param2.code,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.name != null">
+                AND `name` LIKE CONCAT('%', #{param2.name,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.desc != null">
+                AND `desc` LIKE CONCAT('%', #{param2.desc,jdbcType=VARCHAR}, '%')
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <select id="getDepartmentTree" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_department
+        WHERE
+        parent_id IS NULL
+    </select>
+
+    <select id="getDepartmentsByParentId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_department
+        WHERE
+        parent_id = #{id,jdbcType=BIGINT}
+        ORDER BY `order` ASC
+    </select>
+
+</mapper>

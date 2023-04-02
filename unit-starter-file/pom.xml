@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>unit-starters</artifactId>
+        <groupId>com.wordplay.unit</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../unit-starters/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>unit-starter-file</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>unit-starter-file</name>
+    <description>unit-starter-file</description>
+
+    <dependencies>
+        <!-- starter-api-dependency -->
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-api-dependency</artifactId>
+        </dependency>
+        <!-- starter-data-mp -->
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-data-mp</artifactId>
+        </dependency>
+        <!-- starter-util -->
+        <dependency>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-util</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

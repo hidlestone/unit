@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.i18n.mapper.I18nResourceMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.i18n.entity.I18nResource">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="lang_code" jdbcType="VARCHAR" property="langCode"/>
+        <result column="resource_key" jdbcType="VARCHAR" property="resourceKey"/>
+        <result column="resource_value" jdbcType="LONGVARCHAR" property="resourceValue"/>
+        <result column="module_code" jdbcType="VARCHAR" property="moduleCode"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, lang_code, resource_key, resource_value, module_code, create_user_id, modify_user_id,
+        gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_i18n_resource
+        <where>
+            <if test="param2.langCode != null">
+                lang_code LIKE CONCAT('%', #{param2.langCode,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.resourceKey != null">
+                AND resource_key LIKE CONCAT('%', #{param2.resourceKey,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.resourceValue != null">
+                AND resource_value LIKE CONCAT('%', #{param2.resourceValue,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.moduleCode != null">
+                AND module_code LIKE CONCAT('%', #{param2.moduleCode,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

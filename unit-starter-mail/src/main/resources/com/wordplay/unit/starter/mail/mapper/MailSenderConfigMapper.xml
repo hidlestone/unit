@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.mail.mapper.MailSenderConfigMapper">
+	<resultMap id="BaseResultMap" type="com.wordplay.unit.starter.mail.entity.MailSenderConfig">
+		<!--@mbg.generated-->
+		<id column="id" jdbcType="BIGINT" property="id"/>
+		<result column="host" jdbcType="VARCHAR" property="host"/>
+		<result column="port" jdbcType="INTEGER" property="port"/>
+		<result column="username" jdbcType="VARCHAR" property="username"/>
+		<result column="password" jdbcType="VARCHAR" property="password"/>
+		<result column="protocol" jdbcType="VARCHAR" property="protocol"/>
+		<result column="default_encoding" jdbcType="VARCHAR" property="defaultEncoding"/>
+		<result column="properties" jdbcType="LONGVARCHAR" property="properties"/>
+		<result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+		<result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+		<result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+		<result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		<!--@mbg.generated-->
+		id, `host`, port, username, `password`, protocol, default_encoding, properties, create_user_id,
+		modify_user_id, gmt_create, gmt_modified
+	</sql>
+
+	<select id="page" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from s_mail_sender_config
+		<where>
+			<if test="param2.id != null">
+				id = #{param2.id,jdbcType=BIGINT},
+			</if>
+			<if test="param2.host != null">
+				AND `host` LIKE CONCAT('%', #{param2.host,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.port != null">
+				AND port = #{param2.port,jdbcType=INTEGER},
+			</if>
+			<if test="param2.username != null">
+				AND username LIKE CONCAT('%', #{param2.username,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.password != null">
+				AND password LIKE CONCAT('%', #{param2.password,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.protocol != null">
+				AND protocol LIKE CONCAT('%', #{param2.protocol,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.defaultEncoding != null">
+				AND default_encoding LIKE CONCAT('%', #{param2.defaultEncoding,jdbcType=VARCHAR}, '%')
+			</if>
+			<if test="param2.properties != null">
+				AND properties LIKE CONCAT('%', #{param2.properties,jdbcType=LONGVARCHAR}, '%')
+			</if>
+			<!-- 基础字段过滤 -->
+			<include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+		</where>
+		ORDER by id DESC
+	</select>
+
+</mapper>

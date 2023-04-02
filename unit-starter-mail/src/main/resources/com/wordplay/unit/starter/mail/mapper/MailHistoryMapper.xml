@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.mail.mapper.MailHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.mail.entity.MailHistory">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="template_id" jdbcType="BIGINT" property="templateId"/>
+        <result column="config_id" jdbcType="BIGINT" property="configId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="from" jdbcType="VARCHAR" property="from"/>
+        <result column="receive_user_id" jdbcType="BIGINT" property="receiveUserId"/>
+        <result column="receive_user_name" jdbcType="VARCHAR" property="receiveUserName"/>
+        <result column="receive_mail" jdbcType="VARCHAR" property="receiveMail"/>
+        <result column="cc" jdbcType="VARCHAR" property="cc"/>
+        <result column="bcc" jdbcType="VARCHAR" property="bcc"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="file_group_id" jdbcType="BIGINT" property="fileGroupId"/>
+        <result column="try_count" jdbcType="TINYINT" property="tryCount"/>
+        <result column="msg" jdbcType="VARCHAR" property="msg"/>
+        <result column="last_send_time" jdbcType="TIMESTAMP" property="lastSendTime"/>
+        <result column="send_flag" jdbcType="TINYINT" property="sendFlag"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, template_id, config_id, title, `from`, receive_user_id, receive_user_name, receive_mail,
+        cc, bcc, content, file_group_id, try_count, msg, last_send_time, send_flag, create_user_id,
+        modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from s_mail_history
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT},
+            </if>
+            <if test="param2.templateId != null">
+                AND template_id = #{param2.templateId,jdbcType=BIGINT}
+            </if>
+            <if test="param2.configId != null">
+                AND config_id = #{param2.configId,jdbcType=BIGINT}
+            </if>
+            <if test="param2.title != null">
+                AND title LIKE CONCAT('%', #{param2.title,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.from != null">
+                AND `from` LIKE CONCAT('%', #{param2.from,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.receiveUserId != null">
+                AND receive_user_id = #{param2.receiveUserId,jdbcType=BIGINT},
+            </if>
+            <if test="param2.receiveUserName != null">
+                AND receive_user_name LIKE CONCAT('%', #{param2.receiveUserName,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.receiveMail != null">
+                AND receive_mail LIKE CONCAT('%', #{param2.receiveMail,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.cc != null">
+                AND cc LIKE CONCAT('%', #{param2.cc,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.bcc != null">
+                AND bcc LIKE CONCAT('%', #{param2.bcc,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.content != null">
+                AND content LIKE CONCAT('%', #{param2.content,jdbcType=LONGVARCHAR}, '%')
+            </if>
+            <if test="param2.fileGroupId != null">
+                AND fileGroupId LIKE CONCAT('%', #{param2.fileGroupId,jdbcType=BIGINT}, '%')
+            </if>
+            <if test="param2.tryCount != null">
+                AND tryCount = #{param2.tryCount,jdbcType=TINYINT},
+            </if>
+            <if test="param2.msg != null">
+                AND msg LIKE CONCAT('%', #{param2.msg,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.sendFlag != null">
+                AND sendFlag = #{param2.sendFlag,jdbcType=BOOLEAN},
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER by id DESC
+    </select>
+
+</mapper>

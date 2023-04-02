@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wordplay.unit.starter.mq.mapper.MqTraceLogMapper">
+    <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.mq.entity.MqTraceLog">
+        <!--@mbg.generated-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="stage" jdbcType="TINYINT" property="stage"/>
+        <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+        <result column="exchange" jdbcType="VARCHAR" property="exchange"/>
+        <result column="route_key" jdbcType="VARCHAR" property="routeKey"/>
+        <result column="delivery_tag" jdbcType="VARCHAR" property="deliveryTag"/>
+        <result column="consumer_tag" jdbcType="VARCHAR" property="consumerTag"/>
+        <result column="ack_mode" jdbcType="VARCHAR" property="ackMode"/>
+        <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime"/>
+        <result column="consume_time" jdbcType="TIMESTAMP" property="consumeTime"/>
+        <result column="subscriber" jdbcType="VARCHAR" property="subscriber"/>
+        <result column="request_id" jdbcType="BIGINT" property="requestId"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="create_user_id" jdbcType="BIGINT" property="createUserId"/>
+        <result column="modify_user_id" jdbcType="BIGINT" property="modifyUserId"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, stage, content, exchange, route_key, delivery_tag, consumer_tag,
+        ack_mode, publish_time, consume_time, subscriber, request_id, `status`, create_user_id,
+        modify_user_id, gmt_create, gmt_modified
+    </sql>
+
+    <select id="page" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM
+        s_mq_trace_log
+        <where>
+            <if test="param2.id != null">
+                id = #{param2.id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.stage != null">
+                AND stage = #{param2.stage,jdbcType=TINYINT}
+            </if>
+            <if test="param2.content != null">
+                AND content LIKE CONCAT('%', #{param2.content,jdbcType=LONGVARCHAR}, '%')
+            </if>
+            <if test="param2.exchange != null">
+                AND exchange LIKE CONCAT('%', #{param2.exchange,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.routeKey != null">
+                AND route_key LIKE CONCAT('%', #{param2.routeKey,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.deliveryTag != null">
+                AND delivery_tag LIKE CONCAT('%', #{param2.deliveryTag,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.consumerTag != null">
+                AND consumer_tag LIKE CONCAT('%', #{param2.consumerTag,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.ackMode != null">
+                AND ack_mode = #{param2.ackMode,jdbcType=VARCHAR}
+            </if>
+            <if test="param2.subscriber != null">
+                AND subscriber LIKE CONCAT('%', #{param2.subscriber,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="param2.requestId != null">
+                AND request_id = #{param2.requestId,jdbcType=BIGINT}
+            </if>
+            <if test="param2.status != null">
+                AND `status` = #{param2.status,jdbcType=TINYINT}
+            </if>
+            <if test="param2.publishTimeStart != null">
+                AND publzish_time &gt;= #{param2.publishTimeStart, jdbcType=TIMESTAMP}
+            </if>
+            <if test="param2.publishTimeEnd != null">
+                AND publzish_time &lt;= #{param2.publishTimeEnd, jdbcType=TIMESTAMP}
+            </if>
+            <if test="param2.consumeTimeStart != null">
+                AND consume_time &gt;= #{param2.consumeTimeStart, jdbcType=TIMESTAMP}
+            </if>
+            <if test="param2.consumeTimeEnd != null">
+                AND consume_time &lt;= #{param2.consumeTimeEnd, jdbcType=TIMESTAMP}
+            </if>
+            <!-- 基础字段过滤 -->
+            <include refid="com.wordplay.unit.starter.data.mp.mapper.CommonMapper.Common_Column_Filter"/>
+        </where>
+        ORDER by id DESC
+    </select>
+
+</mapper>

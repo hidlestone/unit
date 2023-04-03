@@ -1,7 +1,6 @@
 package com.wordplay.unit.starter.shiro.util;
 
 import com.alibaba.fastjson.JSON;
-import com.fallframework.platform.starter.api.response.ResponseResult;
 import com.wordplay.unit.starter.api.response.ResponseResult;
 import org.apache.shiro.web.util.WebUtils;
 import org.springframework.http.HttpStatus;

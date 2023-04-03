@@ -2,6 +2,7 @@ package com.wordplay.unit.starter.shiro.filter;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.wordplay.unit.starter.api.constant.ApiConstant;
 import com.wordplay.unit.starter.api.response.ResponseResult;
 import com.wordplay.unit.starter.cache.redis.util.RedisUtil;
 import com.wordplay.unit.starter.rbac.constant.RbacStarterConstant;
@@ -137,8 +138,8 @@ public class JWTShiroFilter extends BasicHttpAuthenticationFilter {
 	 */
 	private ResponseResult doRefreshToken(ServletRequest request, ServletResponse response) {
 		HttpServletRequest httpRequest = WebUtils.toHttp(request);
-		String accesstoken = httpRequest.getHeader(CoreContextConstant.ACCESSTOKEN);
-		String refreshtoken = httpRequest.getHeader(CoreContextConstant.REFRESHTOKEN);
+		String accesstoken = httpRequest.getHeader(ApiConstant.ACCESSTOKEN);
+		String refreshtoken = httpRequest.getHeader(ApiConstant.REFRESHTOKEN);
 		/*ResponseResult responseResult = jwtUtil.accessRefreshTokeValidate(accesstoken, refreshtoken);
 		if (!responseResult.isSuccess()) {
 			return responseResult;
@@ -175,12 +176,12 @@ public class JWTShiroFilter extends BasicHttpAuthenticationFilter {
 		this.getSubject(request, response).login(jwtToken);
 		// 最后将刷新的AccessToken存放在Response的Header中的Authorization字段返回
 		HttpServletResponse httpServletResponse = WebUtils.toHttp(response);
-		httpServletResponse.setHeader(CoreContextConstant.ACCESSTOKEN, accesstokenNew);
+		httpServletResponse.setHeader(ApiConstant.ACCESSTOKEN, accesstokenNew);
 		if (StringUtils.isNotEmpty(refreshtokenNew)) {
-			httpServletResponse.setHeader(CoreContextConstant.REFRESHTOKEN, refreshTokenCache);
+			httpServletResponse.setHeader(ApiConstant.REFRESHTOKEN, refreshTokenCache);
 		}
 		// Access-Control-Expose-Headers响应报头指示哪些报头可以公开为通过列出他们的名字的响应的一部分。
-		httpServletResponse.setHeader("Access-Control-Expose-Headers", CoreContextConstant.ACCESSTOKEN + "," + CoreContextConstant.REFRESHTOKEN);
+		httpServletResponse.setHeader("Access-Control-Expose-Headers", ApiConstant.ACCESSTOKEN + "," + ApiConstant.REFRESHTOKEN);
 		return ResponseResult.success();
 	}
 
@@ -190,7 +191,7 @@ public class JWTShiroFilter extends BasicHttpAuthenticationFilter {
 	@Override
 	protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
 		HttpServletRequest httpRequest = WebUtils.toHttp(request);
-		String accessToken = httpRequest.getHeader(CoreContextConstant.ACCESSTOKEN);
+		String accessToken = httpRequest.getHeader(ApiConstant.ACCESSTOKEN);
 		String username = jwtUtil.getClaim(accessToken, "username");
 		JWTToken jwtToken = new JWTToken(username, accessToken);
 		// 提交给UserRealm进行认证，如果错误会抛出异常并被捕获
@@ -211,8 +212,8 @@ public class JWTShiroFilter extends BasicHttpAuthenticationFilter {
 		/*return super.isLoginAttempt(request, response);*/
 		// 拿到当前Header中Authorization的AccessToken(Shiro中getAuthzHeader方法已经实现)
 		HttpServletRequest httpRequest = WebUtils.toHttp(request);
-		String accessToken = httpRequest.getHeader(CoreContextConstant.ACCESSTOKEN);
-		String refreshToken = httpRequest.getHeader(CoreContextConstant.REFRESHTOKEN);
+		String accessToken = httpRequest.getHeader(ApiConstant.ACCESSTOKEN);
+		String refreshToken = httpRequest.getHeader(ApiConstant.REFRESHTOKEN);
 		return !StringUtils.isBlank(accessToken) && !StringUtils.isBlank(refreshToken);
 	}
 

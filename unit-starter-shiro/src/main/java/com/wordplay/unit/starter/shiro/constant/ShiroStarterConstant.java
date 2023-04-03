@@ -11,7 +11,7 @@ public class ShiroStarterConstant {
 	 * SHIRO 配置参数组
 	 */
 	public static final String SYS_PARAM_GROUP = "SHIRO";
-	
+
 	/**
 	 * redis shiro缓存前缀
 	 */

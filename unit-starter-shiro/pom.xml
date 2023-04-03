@@ -27,7 +27,6 @@
             <groupId>com.wordplay.unit</groupId>
             <artifactId>unit-starter-cache-ehcache</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-spring</artifactId>

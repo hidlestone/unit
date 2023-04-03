@@ -2,6 +2,7 @@ package com.wordplay.unit.starter.shiro.config;
 
 import cn.hutool.core.codec.Base64;
 import com.alibaba.fastjson.JSON;
+import com.wordplay.unit.starter.api.constant.ApiConstant;
 import com.wordplay.unit.starter.cache.redis.util.RedisUtil;
 import com.wordplay.unit.starter.shiro.constant.ShiroStarterConstant;
 import com.wordplay.unit.starter.shiro.custom.JWTSubjectFactory;
@@ -242,7 +243,7 @@ public class ShiroConfig {
 	 */
 	public SimpleCookie rememberMeCookie() {
 		// cookie名称remember-me
-		SimpleCookie cookie = new SimpleCookie(CoreContextConstant.REMEMBER_ME);
+		SimpleCookie cookie = new SimpleCookie(ApiConstant.REMEMBER_ME);
 		// cookie存活时间
 		cookie.setMaxAge(REMEMBER_ME_COOKIE_MAX_AGE);
 		// 请求是否为htt请求，防止恶意攻击

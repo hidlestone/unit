@@ -50,6 +50,9 @@ public class LeafPageUtil {
 
 	public static Leaf leafToType(Leaf leaf, Class clazz) {
 		List records = leaf.getRecords();
+		if (null == records || records.size() == 0) {
+			return leaf;
+		}
 		if (null != clazz) {
 			try {
 				List list = JSON.parseArray(JSON.toJSONString(records), clazz);

@@ -16,8 +16,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.fallframework.platform</groupId>
-            <artifactId>fall-platform-starter-data-mp</artifactId>
+            <groupId>com.wordplay.unit</groupId>
+            <artifactId>unit-starter-data-mp</artifactId>
         </dependency>
         <!--ureport 依赖-->
         <dependency>
@@ -40,5 +40,5 @@
             <artifactId>commons-pool</artifactId>
         </dependency>
     </dependencies>
-    
+
 </project>

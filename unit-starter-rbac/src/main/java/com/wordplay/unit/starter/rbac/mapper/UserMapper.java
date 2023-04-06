@@ -6,6 +6,6 @@ import com.wordplay.unit.starter.rbac.entity.User;
 
 public interface UserMapper extends BaseMapper<User> {
 
-	Page<User> list(Page<User> page, User user);
+	Page<User> page(Page<User> page, User user);
 
 }

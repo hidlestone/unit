@@ -6,6 +6,6 @@ import com.wordplay.unit.starter.rbac.entity.User;
 
 public interface UserService extends IService<User> {
 
-	Leaf<User> list(User user);
+	Leaf<User> page(User user);
 
 }

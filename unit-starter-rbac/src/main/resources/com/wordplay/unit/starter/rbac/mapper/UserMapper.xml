@@ -37,7 +37,7 @@
 		gmt_create, gmt_modified
 	</sql>
 
-    <select id="list" resultMap="BaseResultMap">
+    <select id="page" resultMap="BaseResultMap">
         SELECT
         <include refid="Show_Column_List"/>
         FROM

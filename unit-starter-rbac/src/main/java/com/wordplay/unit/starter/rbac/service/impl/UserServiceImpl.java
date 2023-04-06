@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
 
 	@Override
-	public Leaf<User> list(User user) {
+	public Leaf<User> page(User user) {
 		Page<User> page = new Page<>(user.getPageNum(), user.getPageSize());
-		page = this.baseMapper.list(page, user);
+		page = this.baseMapper.page(page, user);
 		return LeafPageUtil.pageToLeaf(page);
 	}
 

@@ -17,7 +17,6 @@ public class MpSQLLoggerFilter extends Filter<ILoggingEvent> {
 		return "org.apache.ibatis.logging.stdout.StdOutImpl".equals(event.getLoggerName())
 				? FilterReply.DENY : FilterReply.NEUTRAL;
 	}
-
 	
 	/*
 	com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor

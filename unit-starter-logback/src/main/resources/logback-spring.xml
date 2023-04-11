@@ -4,8 +4,8 @@
     <!-- 应用名称 -->
     <springProperty name="application.name" source="spring.application.name"/>
     <!-- 日志保存路径 -->
-    <springProperty name="filePath" source="platform.starter.logback.filePath"/>
-    <springProperty name="mapper" source="platform.starter.logback.mapper"/>
+    <springProperty name="filePath" source="unit-starter.logback.filePath"/>
+    <springProperty name="mapper" source="unit.starter.logback.mapper"/>
     <!-- 日志保存路径 : /deploy/log/${application.name} -->
     <property name="LOG_HOME" value="${filePath:-/deploy/log}/${application.name}"/>
 

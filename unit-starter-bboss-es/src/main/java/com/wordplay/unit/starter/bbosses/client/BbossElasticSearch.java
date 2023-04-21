@@ -1,10 +1,20 @@
 package com.wordplay.unit.starter.bbosses.client;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
 import com.wordplay.unit.starter.api.response.ResponseResult;
+import com.wordplay.unit.starter.bbosses.constant.ElasticSearchConstant;
+import com.wordplay.unit.starter.bbosses.model.RangeObject;
+import com.wordplay.unit.starter.bbosses.model.SearchVO;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.frameworkset.elasticsearch.ElasticSearchHelper;
 import org.frameworkset.elasticsearch.bulk.BulkCommand;
 import org.frameworkset.elasticsearch.bulk.BulkInterceptor;
@@ -21,9 +31,15 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author zhuangpf
@@ -413,7 +429,17 @@ public class BbossElasticSearch {
 		return jsonObject.getBoolean("errors") ? ResponseResult.fail(result) : ResponseResult.success(result);
 	}
 
-	public ResponseResult<String> deleteByQueryTemplate(String indexName, String esmapper, String templateName, Map<String, Object> params, boolean waitForCompletion) {
+	/**
+	 * 根据模板删除数据
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @param waitForCompletion
+	 * @return
+	 */
+	public ResponseResult deleteByQueryTemplate(String indexName, String esmapper, String templateName, Map<String, Object> params, boolean waitForCompletion) {
 		ClientInterface clientUtil = this.esConfigClient(esmapper);
 		String path = indexName + "/_delete_by_query?&" + "scroll_size" + "=" + 10000 + "&" + "slices" + "=" + ElasticSearchConstant.DELETE_BY_QUERY_SCROLL_SLICES + "&" + "conflicts" + "=" + "proceed" + "&" + "wait_for_completion" + "=" + waitForCompletion;
 		String result = clientUtil.deleteByQuery(path, templateName, params);
@@ -421,6 +447,483 @@ public class BbossElasticSearch {
 		boolean exist = json.getInteger("deleted") != null && json.getInteger("deleted") > 0 || !waitForCompletion;
 		return exist ? ResponseResult.success(result) : ResponseResult.fail(result);
 	}
-	
+
+	/**
+	 * 根据模板删除数据
+	 *
+	 * @param searchVO
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @return
+	 */
+	public ResponseResult deleteByQueryTemplate(SearchVO searchVO, String esmapper, String templateName, Map params) {
+		if (searchVO.getIndexNames().isEmpty()) {
+			return ResponseResult.fail();
+		} else {
+			// searchVO转换成map条件
+			Map map = this.translateSearchVO(searchVO);
+			if (CollectionUtil.isNotEmpty(params)) {
+				map.putAll(params);
+			}
+			ResponseResult<String> responseResult = this.deleteByQueryTemplate(this.getJoinedIndices(searchVO.getIndexNames()), esmapper, templateName, map, true);
+			LOGGER.info("deleteByQueryTemplate code:{}", responseResult.getCode());
+			return responseResult;
+		}
+	}
+
+	/**
+	 * 根据模板删除数据-异步
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @return
+	 */
+	public ResponseResult deleteByQueryTemplateAsync(String indexName, String esmapper, String templateName, Map<String, Object> params) {
+		return this.deleteByQueryTemplate(indexName, esmapper, templateName, params, false);
+	}
+
+	/**
+	 * 根据模板更新
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @param waitForCompletion
+	 * @return
+	 */
+	public ResponseResult<String> updateByQueryTemplate(String indexName, String esmapper, String templateName, Map<String, Object> params, boolean waitForCompletion) {
+		ClientInterface clientUtil = this.esConfigClient(esmapper);
+		String path = indexName + "/_update_by_query?&" + "scroll_size" + "=" + 10000 + "&" + "slices" + "=" + ElasticSearchConstant.UPDATE_BY_QUERY_SCROLL_SLICES + "&" + "conflicts" + "=" + "proceed" + "&" + "wait_for_completion" + "=" + waitForCompletion;
+		String result = clientUtil.updateByQuery(path, templateName, params);
+		LOGGER.info("updateByQueryTemplate result:{}", result);
+		JSONObject json = JSONObject.parseObject(result);
+		boolean exist = json.getInteger("total") != null && json.getInteger("total") > 0 || !waitForCompletion;
+		return exist ? ResponseResult.success(result) : ResponseResult.fail(result);
+	}
+
+	/**
+	 * 根据模板更新
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @param waitForCompletion
+	 * @return
+	 */
+	public ResponseResult<String> updateByQueryTemplateNew(String indexName, String esmapper, String templateName, Map<String, Object> params, boolean waitForCompletion) {
+		ClientInterface clientUtil = this.esConfigClient(esmapper);
+		String path = indexName + "/_update_by_query?" + "wait_for_completion" + "=" + waitForCompletion;
+		String result = clientUtil.updateByQuery(path, templateName, params);
+		LOGGER.info("updateByQueryTemplate result:{}", result);
+		JSONObject json = JSONObject.parseObject(result);
+		boolean exist = json.getInteger("total") != null && json.getInteger("total") > 0 || !waitForCompletion;
+		return exist ? ResponseResult.success(result) : ResponseResult.fail(result);
+	}
+
+	/**
+	 * 根据模板更新&刷新
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @param waitForCompletion
+	 * @return
+	 */
+	public ResponseResult<String> updateByQueryTemplateRefresh(String indexName, String esmapper, String templateName, Map<String, Object> params, boolean waitForCompletion) {
+		ClientInterface clientUtil = this.esConfigClient(esmapper);
+		String path = indexName + "/_update_by_query?&" + "scroll_size" + "=" + 10000 + "&" + "slices" + "=" + ElasticSearchConstant.UPDATE_BY_QUERY_SCROLL_SLICES + "&" + "conflicts" + "=" + "proceed" + "&" + "wait_for_completion" + "=" + waitForCompletion + "&refresh";
+		String result = clientUtil.updateByQuery(path, templateName, params);
+		LOGGER.info("updateByQueryTemplate result:{}", result);
+		return ResponseResult.success(result);
+	}
+
+	/**
+	 * 根据模板更新
+	 *
+	 * @param searchVO
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @return
+	 */
+	public boolean updateByQueryTemplate(SearchVO searchVO, String esmapper, String templateName, Map params) {
+		Map map = this.translateSearchVO(searchVO);
+		if (searchVO.getIndexNames().isEmpty()) {
+			return false;
+		} else {
+			if (CollectionUtil.isNotEmpty(params)) {
+				map.putAll(params);
+			}
+			ResponseResult<String> result = this.updateByQueryTemplate(this.getJoinedIndices(searchVO.getIndexNames()), esmapper, templateName, map, true);
+			LOGGER.info("updateByQueryTemplate code:{}, msg:{}", result.getCode(), result.getMessage());
+			return result.isSuccess();
+		}
+	}
+
+	/**
+	 * 根据模板更新
+	 *
+	 * @param indexName
+	 * @param esmapper
+	 * @param templateName
+	 * @param params
+	 * @return
+	 */
+	public ResponseResult<String> updateByQueryTemplateAsync(String indexName, String esmapper, String templateName, Map<String, Object> params) {
+		return this.updateByQueryTemplate(indexName, esmapper, templateName, params, false);
+	}
+
+	public BoolQueryBuilder packQueryBuilder(SearchVO vo) {
+		BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+		// TermMap
+		if (CollectionUtil.isNotEmpty(vo.getTermMap())) {
+			for (Map.Entry<String, Object> entry : vo.getTermMap().entrySet()) {
+				if (entry.getValue() instanceof Collection) {
+					if (vo.getFilterFlag()) {
+						boolQueryBuilder.filter(QueryBuilders.termsQuery(entry.getKey(), (Collection) entry.getValue()));
+					} else {
+						boolQueryBuilder.must(QueryBuilders.termsQuery(entry.getKey(), (Collection) entry.getValue()));
+					}
+				} else if (entry.getValue() instanceof Object[]) {
+					if (vo.getFilterFlag()) {
+						boolQueryBuilder.filter(QueryBuilders.termsQuery(entry.getKey(), (Object[]) (entry.getValue())));
+					} else {
+						boolQueryBuilder.must(QueryBuilders.termsQuery(entry.getKey(), (Object[]) (entry.getValue())));
+					}
+				} else if (vo.getFilterFlag()) {
+					boolQueryBuilder.filter(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
+				} else {
+					boolQueryBuilder.must(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+		// ShouldMap
+		if (CollectionUtil.isNotEmpty(vo.getShouldMap())) {
+			boolQueryBuilder.minimumShouldMatch(1);
+			for (Map.Entry<String, Object> entry : vo.getShouldMap().entrySet()) {
+				if (entry.getValue() instanceof Collection) {
+					boolQueryBuilder.should(QueryBuilders.termsQuery(entry.getKey(), (Collection) entry.getValue()));
+				} else if (entry.getValue() instanceof Object[]) {
+					boolQueryBuilder.should(QueryBuilders.termsQuery(entry.getKey(), (Object[]) (entry.getValue())));
+				} else {
+					boolQueryBuilder.should(QueryBuilders.termQuery(entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+		// NotContainField
+		if (StringUtils.isNotBlank(vo.getNotContainField())) {
+			boolQueryBuilder.mustNot(QueryBuilders.existsQuery(vo.getNotContainField()));
+		}
+		// ContainField
+		if (StringUtils.isNotBlank(vo.getContainField())) {
+			boolQueryBuilder.must(QueryBuilders.existsQuery(vo.getContainField()));
+		}
+		// WildcardMap
+		if (CollectionUtil.isNotEmpty(vo.getWildcardMap())) {
+			if (vo.getShouldFlag()) {
+				for (Map.Entry<String, String> entry : vo.getWildcardMap().entrySet()) {
+					boolQueryBuilder.should(QueryBuilders.wildcardQuery(entry.getKey(), entry.getValue()));
+				}
+			} else {
+				for (Map.Entry<String, String> entry : vo.getWildcardMap().entrySet()) {
+					boolQueryBuilder.must(QueryBuilders.wildcardQuery(entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+		// TermNotMap
+		if (CollectionUtil.isNotEmpty(vo.getTermNotMap())) {
+			for (Map.Entry<String, Object> entry : vo.getTermNotMap().entrySet()) {
+				if (entry.getValue() instanceof Collection) {
+					boolQueryBuilder.mustNot(QueryBuilders.termsQuery((String) entry.getKey(), (Collection) entry.getValue()));
+				} else if (entry.getValue() instanceof Object[]) {
+					boolQueryBuilder.mustNot(QueryBuilders.termsQuery((String) entry.getKey(), (Object[]) ((Object[]) entry.getValue())));
+				} else {
+					boolQueryBuilder.mustNot(QueryBuilders.termQuery((String) entry.getKey(), entry.getValue()));
+				}
+			}
+		}
+		// MatchMap
+		if (CollectionUtil.isNotEmpty(vo.getMatchMap())) {
+			for (Map.Entry<String, Object> entry : vo.getMatchMap().entrySet()) {
+				boolQueryBuilder.must(QueryBuilders.matchQuery((String) entry.getKey(), entry.getValue()));
+			}
+		}
+		// RangeMap
+		if (CollectionUtil.isNotEmpty(vo.getRangeMap())) {
+			for (Map.Entry<String, RangeObject> entry : vo.getRangeMap().entrySet()) {
+				RangeObject range = (RangeObject) entry.getValue();
+				boolQueryBuilder.filter(QueryBuilders.rangeQuery((String) entry.getKey()).from(range.getStartNum()).to(range.getEndNum()));
+			}
+		}
+		// QueryStr
+		if (StringUtils.isNotBlank(vo.getQueryStr())) {
+			String queryStr = vo.getQueryStr();
+			try {
+				String regex = "(\\s+|)\\S+:\\[\\S+-\\S+]";
+				Pattern pattern = Pattern.compile(regex);
+				String rangeStr;
+				for (Matcher matcher = pattern.matcher(vo.getQueryStr()); matcher.find(); queryStr = queryStr.replace(rangeStr, "")) {
+					rangeStr = matcher.group();
+					RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(rangeStr.split(":", 2)[0].trim());
+					String key = "\\[(.+?)\\]";
+					Pattern p = Pattern.compile(key);
+					Matcher m = p.matcher(rangeStr);
+					while (m.find()) {
+						String range = m.group(1);
+						String rangeStart = range.split("-", 2)[0];
+						String rangeEnd = range.split("-", 2)[1];
+						rangeQueryBuilder.gte(rangeStart);
+						rangeQueryBuilder.lte(rangeEnd);
+					}
+					int idx = queryStr.indexOf(rangeStr);
+					if (idx > 3) {
+						if (queryStr.substring(idx - 3, idx).toUpperCase().indexOf("OR") > -1) {
+							boolQueryBuilder.should(rangeQueryBuilder);
+						}
+						if (queryStr.substring(idx - 3, idx).toUpperCase().indexOf("AND") > -1) {
+							boolQueryBuilder.must(rangeQueryBuilder);
+						}
+						queryStr = queryStr.replace(queryStr.substring(idx - 3, idx + rangeStr.length()), "");
+					}
+					boolQueryBuilder.must(rangeQueryBuilder);
+				}
+			} catch (Exception var15) {
+				var15.printStackTrace();
+			}
+			if (null != queryStr && StringUtils.isNotBlank(queryStr.trim())) {
+				queryStr = this.decodeXss(queryStr);
+				QueryStringQueryBuilder queryBuilder = QueryBuilders.queryStringQuery(queryStr);
+				if (!vo.getQueryStrFields().isEmpty()) {
+					queryBuilder.fields(vo.getQueryStrFields());
+				}
+
+				boolQueryBuilder.must(queryBuilder);
+			}
+		}
+		// PrefixMap
+		if (CollectionUtil.isNotEmpty(vo.getPrefixMap())) {
+			for (Map.Entry<String, String> entry : vo.getPrefixMap().entrySet()) {
+				boolQueryBuilder.must(QueryBuilders.prefixQuery((String) entry.getKey(), (String) entry.getValue()));
+			}
+		}
+
+		Map map;
+		BoolQueryBuilder mustBoolBuilder;
+		List mustAndShouldMapList;
+		Iterator var23;
+		Iterator var24;
+		Map.Entry entry;
+		Collection c;
+		boolean isIntType;
+		Iterator iter;
+		Object next;
+		if (CollectionUtil.isNotEmpty(vo.getMustAndShouldMapList())) {
+			mustAndShouldMapList = vo.getMustAndShouldMapList();
+
+			label208:
+			for (var23 = mustAndShouldMapList.iterator(); var23.hasNext(); boolQueryBuilder.must(mustBoolBuilder)) {
+				map = (Map) var23.next();
+				mustBoolBuilder = QueryBuilders.boolQuery();
+				var24 = map.entrySet().iterator();
+
+				while (true) {
+					while (true) {
+						if (!var24.hasNext()) {
+							continue label208;
+						}
+						entry = (Map.Entry) var24.next();
+						String key = ((String) entry.getKey()).split("-")[0];
+						if (entry.getValue() instanceof Collection) {
+							c = (Collection) entry.getValue();
+							isIntType = false;
+							if (CollectionUtil.isNotEmpty(c)) {
+								iter = c.iterator();
+
+								while (iter.hasNext()) {
+									next = iter.next();
+									if (next instanceof Integer) {
+										isIntType = true;
+									}
+								}
+							}
+
+							if (isIntType) {
+								mustBoolBuilder.should(QueryBuilders.termsQuery(key, (Collection) entry.getValue()));
+							} else {
+								mustBoolBuilder.should(QueryBuilders.termsQuery(key + "keyword", (Collection) entry.getValue()));
+							}
+						} else if (entry.getValue() instanceof Object[]) {
+							mustBoolBuilder.should(QueryBuilders.termsQuery(key + "keyword", (Object[]) ((Object[]) entry.getValue())));
+						} else if (entry.getValue() instanceof Integer) {
+							mustBoolBuilder.should(QueryBuilders.termQuery(key, entry.getValue()));
+						} else {
+							mustBoolBuilder.should(QueryBuilders.termQuery(key + "keyword", entry.getValue()));
+						}
+					}
+				}
+			}
+		}
+
+		if (CollectionUtil.isNotEmpty(vo.getShouldAndMustMapList())) {
+			mustAndShouldMapList = vo.getMustAndShouldMapList();
+
+			label182:
+			for (var23 = mustAndShouldMapList.iterator(); var23.hasNext(); boolQueryBuilder.should(mustBoolBuilder)) {
+				map = (Map) var23.next();
+				mustBoolBuilder = QueryBuilders.boolQuery();
+				var24 = map.entrySet().iterator();
+
+				while (true) {
+					while (true) {
+						if (!var24.hasNext()) {
+							continue label182;
+						}
+
+						entry = (Map.Entry) var24.next();
+						String key = ((String) entry.getKey()).split("-")[0];
+						if (entry.getValue() instanceof Collection) {
+							c = (Collection) entry.getValue();
+							isIntType = false;
+							if (CollectionUtil.isNotEmpty(c)) {
+								iter = c.iterator();
+
+								while (iter.hasNext()) {
+									next = iter.next();
+									if (next instanceof Integer) {
+										isIntType = true;
+									}
+								}
+							}
+
+							if (isIntType) {
+								mustBoolBuilder.must(QueryBuilders.termsQuery(key, (Collection) entry.getValue()));
+							} else {
+								mustBoolBuilder.must(QueryBuilders.termsQuery(key + "keyword", (Collection) entry.getValue()));
+							}
+						} else if (entry.getValue() instanceof Object[]) {
+							mustBoolBuilder.must(QueryBuilders.termsQuery(key + "keyword", (Object[]) ((Object[]) entry.getValue())));
+						} else if (entry.getValue() instanceof Integer) {
+							mustBoolBuilder.must(QueryBuilders.termQuery(key, entry.getValue()));
+						} else {
+							mustBoolBuilder.must(QueryBuilders.termQuery(key + "keyword", entry.getValue()));
+						}
+					}
+				}
+			}
+		}
+
+		return boolQueryBuilder;
+	}
+
+	private String decodeXss(String str) {
+		if (StringUtils.isNotBlank(str)) {
+			str = str.replaceAll("&lt;", "<");
+			str = str.replaceAll("&gt;", ">");
+			str = str.replaceAll("&prime;", "'");
+			str = str.replaceAll("&quot;", "\"");
+			str = str.replaceAll("&lt;", "<");
+			str = str.replaceAll("&#61;", "=");
+			str = str.replaceAll("”", "\"");
+			str = str.replaceAll("：", ":");
+			str = str.replaceAll("【", "[");
+			str = str.replaceAll("】", "]");
+			str = str.replaceAll("￥", "\\\\");
+		}
+		return str;
+	}
+
+	/**
+	 * 索引名称，逗号分割
+	 *
+	 * @param indexNames 索引列表
+	 * @return
+	 */
+	public String getJoinedIndices(List<String> indexNames) {
+		if (indexNames.size() > 0) {
+			Set<String> indexNamesSet = new LinkedHashSet();
+			indexNamesSet.addAll(indexNames);
+			return Joiner.on(',').join(indexNamesSet);
+		} else {
+			return "_all";
+		}
+	}
+
+	/**
+	 * searchVO转换成Map条件
+	 *
+	 * @param searchVO
+	 * @return
+	 */
+	public Map translateSearchVO(SearchVO searchVO) {
+		Map conditions = new HashMap();
+		Map shoulds = new HashMap();
+		// 查询条件
+		Map<String, Object> term = new HashMap();
+		Map<String, Object> terms = new HashMap();
+		Map<String, Object> range = new HashMap();
+		Map<String, Object> match = new HashMap();
+		Map<String, Object> termShould = new HashMap();
+		Map<String, Object> termsShould = new HashMap();
+		// TermMap
+		if (CollectionUtil.isNotEmpty(searchVO.getTermMap())) {
+			for (Map.Entry<String, Object> entry : searchVO.getTermMap().entrySet()) {
+				if (entry.getValue() instanceof Collection) {
+					terms.put(entry.getKey(), (Collection) entry.getValue());
+				} else if (entry.getValue() instanceof Object[]) {
+					terms.put(entry.getKey(), (Object[]) ((Object[]) entry.getValue()));
+				} else {
+					term.put(entry.getKey(), entry.getValue());
+				}
+			}
+
+		}
+		// ShouldMap
+		if (CollectionUtil.isNotEmpty(searchVO.getShouldMap())) {
+			for (Map.Entry<String, Object> entry : searchVO.getShouldMap().entrySet()) {
+				if (entry.getValue() instanceof Collection) {
+					termsShould.put(entry.getKey(), (Collection) entry.getValue());
+				} else if (entry.getValue() instanceof Object[]) {
+					termsShould.put(entry.getKey(), (Object[]) ((Object[]) entry.getValue()));
+				} else {
+					termShould.put(entry.getKey(), entry.getValue());
+				}
+			}
+		}
+		// MatchMap
+		if (CollectionUtil.isNotEmpty(searchVO.getMatchMap())) {
+			for (Map.Entry<String, Object> entry : searchVO.getMatchMap().entrySet()) {
+				match.put(entry.getKey(), entry.getValue());
+			}
+		}
+		// RangeMap
+		if (CollectionUtil.isNotEmpty(searchVO.getRangeMap())) {
+			for (Map.Entry<String, RangeObject> entry : searchVO.getRangeMap().entrySet()) {
+				Map map = new HashMap();
+				map.put("from", entry.getValue().getStartNum());
+				map.put("to", entry.getValue().getEndNum());
+				range.put(entry.getKey(), map);
+			}
+		}
+		// 组装条件
+		conditions.put("range", range);
+		conditions.put("term", term);
+		conditions.put("terms", terms);
+		conditions.put("match", match);
+		shoulds.put("term", termShould);
+		shoulds.put("terms", termsShould);
+		Map params = new HashMap();
+		// 查询参数
+		params.put("conditions", conditions);
+		params.put("shoulds", shoulds);
+		params.put("includes", searchVO.getIncludes());
+		return params;
+	}
+
 
 }

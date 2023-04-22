@@ -57,5 +57,14 @@ public class CurrentContextHelper {
 		return currentContext;
 	}
 
+	/**
+	 * 设置当前请求上下文
+	 *
+	 * @param currentContext 当前请求上下文
+	 */
+	public static void set(CurrentContext currentContext) {
+		CURRENT_CONTEXT.set(currentContext);
+	}
+
 
 }

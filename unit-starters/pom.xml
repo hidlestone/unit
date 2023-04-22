@@ -46,6 +46,7 @@
         <module>../unit-starter-sms-aliyun</module>
         <module>../unit-starter-bboss-es</module>
         <module>../unit-starter-hbase</module>
+        <module>../unit-starter-core</module>
     </modules>
 
 </project>

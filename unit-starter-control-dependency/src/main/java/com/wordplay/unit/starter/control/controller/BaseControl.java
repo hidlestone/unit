@@ -15,6 +15,11 @@ public class BaseControl {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseControl.class);
 
+	/**
+	 * 是否是admin角色
+	 *
+	 * @return
+	 */
 	protected boolean isAdmin() {
 		return Arrays.asList(this.getRoleCodes().split(",")).contains("admin");
 	}
@@ -22,6 +27,10 @@ public class BaseControl {
 	protected String getRoleCodes() {
 		return this.getUserAuthInfo().getRoleCodes();
 	}
-	
-	
+
+	protected UserAuthInfo getUserAuthInfo() {
+		return CurrentContextHelper.getUserAuthInfo() != null ? CurrentContextHelper.getUserAuthInfo() : new UserAuthInfo();
+	}
+
+
 }

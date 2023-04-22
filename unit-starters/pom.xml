@@ -45,7 +45,7 @@
         <module>../unit-starter-control-dependency</module>
         <module>../unit-starter-sms-aliyun</module>
         <module>../unit-starter-bboss-es</module>
-        <module>unit-starter-mq-kafka</module>
+        <module>../unit-starter-hbase</module>
     </modules>
 
 </project>

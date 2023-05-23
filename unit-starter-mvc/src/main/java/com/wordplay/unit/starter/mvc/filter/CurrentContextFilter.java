@@ -106,11 +106,6 @@ public class CurrentContextFilter implements Filter {
 		return true;
 	}
 
-	@Override
-	public void destroy() {
-		LOGGER.debug("CurrentContextFilter destroy.");
-	}
-
 	/**
 	 * 获取用户登录授权信息
 	 *
@@ -205,6 +200,11 @@ public class CurrentContextFilter implements Filter {
 			target = request.getHeader("target");
 		}
 		return target == null ? "" : target;
+	}
+
+	@Override
+	public void destroy() {
+		LOGGER.debug("CurrentContextFilter destroy.");
 	}
 
 }

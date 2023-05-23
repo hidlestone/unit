@@ -4,6 +4,7 @@
     <resultMap id="BaseResultMap" type="com.wordplay.unit.starter.rbac.entity.Permission">
         <!--@mbg.generated-->
         <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="service_code" jdbcType="VARCHAR" property="serviceCode"/>
         <result column="permission_code" jdbcType="VARCHAR" property="permissionCode"/>
         <result column="permission_name" jdbcType="VARCHAR" property="permissionName"/>
         <result column="resource_value" jdbcType="VARCHAR" property="resourceValue"/>
@@ -16,11 +17,11 @@
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, permission_code, permission_name, resource_value, order_num, authc_type, create_user_id,
+        id, service_code, permission_code, permission_name, resource_value, order_num, authc_type, create_user_id,
         modify_user_id, gmt_create, gmt_modified
     </sql>
 
-    <select id="selectAllRolePermission" resultType="com.wordplay.unit.starter.rbac.entity.Role">
+    <select id="getAllRolePermission" resultType="com.wordplay.unit.starter.rbac.entity.RolePermission">
 		SELECT
 			r.id AS id,
 			r.role_code AS roleCode,
@@ -31,12 +32,9 @@
 			s_role_permission rp
 		LEFT JOIN s_role r ON r.id = rp.role_id
 		LEFT JOIN s_permission p ON p.id = rp.permission_id
-		WHERE
-			r.role_code IS NOT NULL	
 	</select>
 
-    <select id="getPermissionListByUserId" resultType="com.wordplay.unit.starter.rbac.entity.Permission"
-            parameterType="long">
+    <select id="getPermissionListByUserId" resultType="com.wordplay.unit.starter.rbac.entity.Permission" parameterType="long">
 		SELECT
 			resource_value AS resourceValue,
 			authc_type AS authcType
@@ -60,13 +58,16 @@
 			)
 	</select>
 
-    <select id="list" resultMap="BaseResultMap">
+    <select id="page" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from s_permission
         <where>
             <if test="param2.id != null">
                 id = #{id,jdbcType=BIGINT}
+            </if>
+            <if test="param2.serviceCode != null">
+                AND service_code LIKE CONCAT('%', #{param2.serviceCode,jdbcType=VARCHAR}, '%')
             </if>
             <if test="param2.permissionCode != null">
                 AND permission_code LIKE CONCAT('%', #{param2.permissionCode,jdbcType=VARCHAR}, '%')

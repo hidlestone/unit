@@ -15,6 +15,8 @@ public class UserAuthInfo implements Serializable {
 
 	// token
 	private String token;
+	// 用户ID
+	private Long id;
 	// 用户账号
 	private String account;
 	// 用户昵称
@@ -25,7 +27,7 @@ public class UserAuthInfo implements Serializable {
 	private SexEnum sex;
 	// 状态
 	private StatusEnum status;
-	// 角色列表
+	// 角色列表：需要时再进行设置
 	private List<String> roleCodeList;
 
 	public String getToken() {
@@ -34,6 +36,14 @@ public class UserAuthInfo implements Serializable {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getAccount() {
@@ -83,5 +93,5 @@ public class UserAuthInfo implements Serializable {
 	public void setRoleCodeList(List<String> roleCodeList) {
 		this.roleCodeList = roleCodeList;
 	}
-	
+
 }

@@ -47,6 +47,7 @@
         <module>../unit-starter-bboss-es</module>
         <module>../unit-starter-hbase</module>
         <module>../unit-starter-core</module>
+        <module>../unit-starter-mvc</module>
     </modules>
 
 </project>

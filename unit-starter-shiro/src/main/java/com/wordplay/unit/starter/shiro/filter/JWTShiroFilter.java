@@ -12,7 +12,7 @@ import com.wordplay.unit.starter.shiro.custom.JWTToken;
 import com.wordplay.unit.starter.shiro.util.JWTUtil;
 import com.wordplay.unit.starter.shiro.util.ShiroUtil;
 import com.wordplay.unit.starter.sysparam.model.SysParamGroupEnum;
-import com.wordplay.unit.starter.sysparam.service.impl.PlatformSysParamUtil;
+import com.wordplay.unit.starter.sysparam.util.SysParamUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -52,11 +52,11 @@ public class JWTShiroFilter extends BasicHttpAuthenticationFilter {
 	/**
 	 * 构造函数
 	 */
-	public JWTShiroFilter(PlatformSysParamUtil platformSysParamUtil, RedisUtil redisUtil, JWTUtil jwtUtil) {
+	public JWTShiroFilter(SysParamUtil sysParamUtil, RedisUtil redisUtil, JWTUtil jwtUtil) {
 		this.redisUtil = redisUtil;
 		this.jwtUtil = jwtUtil;
-		Map<String, String> sysItemMap = platformSysParamUtil.getSysParamGroupItemMap(SysParamGroupEnum.SHIRO.toString()).getData();
-		SHIRO_REFRESH_TOKEN_TIME_INTERVAL = Long.valueOf(platformSysParamUtil.mapGet(sysItemMap, "SHIRO_REFRESH_TOKEN_TIME_INTERVAL"));
+		Map<String, String> sysItemMap = sysParamUtil.getSysParamGroupItemMap(SysParamGroupEnum.SHIRO.toString()).getData();
+		SHIRO_REFRESH_TOKEN_TIME_INTERVAL = Long.valueOf(sysParamUtil.mapGet(sysItemMap, "SHIRO_REFRESH_TOKEN_TIME_INTERVAL"));
 	}
 
 	/**

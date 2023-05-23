@@ -2,7 +2,7 @@ package com.wordplay.unit.starter.core.util;
 
 /**
  * @author zhuangpf
- * @date 2023-04-22
+ * @date 2023-05-22
  */
 public class SnowFlakeGenerator {
 
@@ -49,7 +49,6 @@ public class SnowFlakeGenerator {
 		for (mill = this.getNewstmp(); mill <= this.lastStmp; mill = this.getNewstmp()) {
 			;
 		}
-
 		return mill;
 	}
 
@@ -69,5 +68,4 @@ public class SnowFlakeGenerator {
 		System.out.println(System.currentTimeMillis() - start);
 	}
 	
-
 }

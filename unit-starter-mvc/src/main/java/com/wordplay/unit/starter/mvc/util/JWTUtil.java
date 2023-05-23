@@ -1,4 +1,4 @@
-package com.wordplay.unit.starter.shiro.util;
+package com.wordplay.unit.starter.mvc.util;
 
 import com.alibaba.fastjson.JSON;
 import com.auth0.jwt.JWT;
@@ -7,6 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.wordplay.unit.starter.api.response.ResponseResult;
+import com.wordplay.unit.starter.mvc.constant.MvcStarterConstant;
 import com.wordplay.unit.starter.rbac.entity.User;
 import com.wordplay.unit.starter.rbac.model.TokenTypeEnum;
 import com.wordplay.unit.starter.sysparam.model.SysParamGroupEnum;
@@ -20,7 +21,8 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * JWT工具类
+ * JWT工具类<br/>
+ * HMAC256 加密算法
  *
  * @author zhuangpf
  */
@@ -29,31 +31,23 @@ public class JWTUtil {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JWTUtil.class);
 
-	/**
-	 * 默认token发布者
-	 */
+	// 默认token发布者
 	private final String DEFAULT_ISSUER;
-	/**
-	 * JWT加密key
-	 */
+	// JWT加密key
 	private final String JWT_SECRET_KEY;
-	/**
-	 * refreshtoken过期时间
-	 */
+	// refreshtoken过期时间
 	private final Long SHIRO_REFRESHTOKEN_TTL;
-	/**
-	 * accesstoken过期时间
-	 */
+	// accesstoken过期时间
 	private final Long SHIRO_ACCESSTOKEN_TTL;
 
 	public JWTUtil(SysParamUtil sysParamUtil) {
 		// 从缓存中获取配置参数：JWT
 		Map<String, String> sysItemMap = sysParamUtil.getSysParamGroupItemMap(SysParamGroupEnum.JWT.toString()).getData();
-		DEFAULT_ISSUER = sysParamUtil.mapGet(sysItemMap, "DEFAULT_ISSUER");
-		JWT_SECRET_KEY = sysParamUtil.mapGet(sysItemMap, "JWT_SECRET_KEY");
-		sysItemMap = sysParamUtil.getSysParamGroupItemMap(SysParamGroupEnum.SHIRO.toString()).getData();
-		SHIRO_REFRESHTOKEN_TTL = Long.valueOf(sysParamUtil.mapGet(sysItemMap, "SHIRO_REFRESHTOKEN_TTL"));
-		SHIRO_ACCESSTOKEN_TTL = Long.valueOf(sysParamUtil.mapGet(sysItemMap, "SHIRO_ACCESSTOKEN_TTL"));
+		DEFAULT_ISSUER = sysParamUtil.mapGet(sysItemMap, MvcStarterConstant.DEFAULT_ISSUER);
+		JWT_SECRET_KEY = sysParamUtil.mapGet(sysItemMap, MvcStarterConstant.JWT_SECRET_KEY);
+		sysItemMap = sysParamUtil.getSysParamGroupItemMap(SysParamGroupEnum.JWT.toString()).getData();
+		SHIRO_REFRESHTOKEN_TTL = Long.valueOf(sysParamUtil.mapGet(sysItemMap, MvcStarterConstant.SHIRO_REFRESHTOKEN_TTL));
+		SHIRO_ACCESSTOKEN_TTL = Long.valueOf(sysParamUtil.mapGet(sysItemMap, MvcStarterConstant.SHIRO_ACCESSTOKEN_TTL));
 		LOGGER.info("JWT CONFIG : " + JSON.toJSONString(sysItemMap));
 	}
 
@@ -77,9 +71,9 @@ public class JWTUtil {
 		Date expireDate = new Date(System.currentTimeMillis() + JWT_TTL * 1000);
 		String token = JWT.create().withIssuer(DEFAULT_ISSUER)
 				// 构建claim信息
-				.withClaim("id", String.valueOf(user.getId()))
-				.withClaim("account", user.getAccount())
-				.withClaim("username", user.getUsername())
+				.withClaim(MvcStarterConstant.ID, String.valueOf(user.getId()))
+				.withClaim(MvcStarterConstant.ACCOUNT, user.getAccount())
+				.withClaim(MvcStarterConstant.USERNAME, user.getUsername())
 				// 设置过期时间
 				.withExpiresAt(expireDate).sign(algo);
 		return token;
@@ -97,9 +91,9 @@ public class JWTUtil {
 		DecodedJWT jwt = verifier.verify(token);
 		Map<String, Claim> claimMap = jwt.getClaims();
 		User user = new User();
-		user.setId(Long.valueOf(claimMap.get("id").asString()));
-		user.setAccount(claimMap.get("account").asString());
-		user.setUsername(claimMap.get("username").asString());
+		user.setId(Long.valueOf(claimMap.get(MvcStarterConstant.ID).asString()));
+		user.setAccount(claimMap.get(MvcStarterConstant.ACCOUNT).asString());
+		user.setUsername(claimMap.get(MvcStarterConstant.USERNAME).asString());
 		return user;
 	}
 

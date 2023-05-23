@@ -38,23 +38,14 @@ public class CurrentContext implements Serializable {
 	// locale
 	private Locale locale;
 
-	public CurrentContext(UserAuthInfo userAuthInfo, String moduleCode, HttpServletRequest request, LocalDateTime requestTime, Long applicationInstanceId, String serviceName) {
+	public CurrentContext(UserAuthInfo userAuthInfo, HttpServletRequest request, LocalDateTime requestTime, Long applicationInstanceId, String serviceName) {
 		this.applicationInstanceId = applicationInstanceId;
 		this.serviceName = serviceName;
 		this.url = "/" + serviceName + (request.getRequestURI().startsWith("/") ? request.getRequestURI() : "/" + request.getRequestURI());
 		this.userAuthInfo = userAuthInfo;
 		this.requestTime = requestTime;
 		this.resolveHttpHeaders(request);
-		this.locale = CurrentContextHelper.toLocale(this.getHeader("language"));
-		if (StringUtils.isNotBlank(moduleCode)) {
-			this.setModuleCodeAndFieldPermission(moduleCode);
-		}
-	}
-
-	public void setModuleCodeAndFieldPermission(String moduleCode) {
-		if (StringUtils.isNotBlank(moduleCode)) {
-			this.httpHeaders.put("module-Code", moduleCode);
-		}
+		this.locale = CurrentContextHelper.toLocale(this.getHeader(CoreStarterConstant.LANGUAGE));
 	}
 
 	/**
@@ -75,34 +66,34 @@ public class CurrentContext implements Serializable {
 			this.httpHeaders.put(headerName, StringUtils.join(list, "@@@"));
 		}
 		// token
-		if (this.httpHeaders.get("token") == null) {
-			this.httpHeaders.put("token", request.getParameter("token"));
+		if (StringUtils.isBlank(this.httpHeaders.get(CoreStarterConstant.TOKEN))) {
+			this.httpHeaders.put(CoreStarterConstant.TOKEN, request.getParameter(CoreStarterConstant.TOKEN));
 		}
 		// client-code
-		if (this.httpHeaders.get("client-code") == null) {
-			this.httpHeaders.put("client-code", request.getParameter("client-code"));
+		if (StringUtils.isBlank(this.httpHeaders.get(CoreStarterConstant.CLIENT_CODE))) {
+			this.httpHeaders.put(CoreStarterConstant.CLIENT_CODE, request.getParameter(CoreStarterConstant.CLIENT_CODE));
 		}
 		// target
-		if (this.httpHeaders.get("target") == null) {
-			this.httpHeaders.put("target", request.getParameter("target"));
+		if (StringUtils.isBlank(this.httpHeaders.get(CoreStarterConstant.TARGET))) {
+			this.httpHeaders.put(CoreStarterConstant.TARGET, request.getParameter(CoreStarterConstant.TARGET));
 		}
 		// request-Id : 请求ID
-		String requestId = this.getHeader("request-Id");
+		String requestId = this.getHeader(CoreStarterConstant.REQUEST_ID);
 		if (StringUtils.isBlank(requestId)) {
-			requestId = request.getParameter("request-Id");
+			requestId = request.getParameter(CoreStarterConstant.REQUEST_ID);
 			if (StringUtils.isBlank(requestId)) {
 				requestId = String.valueOf((new SnowFlakeGenerator(this.applicationInstanceId)).nextId());
 			}
 		}
 		// request-order
-		this.httpHeaders.put("request-Id", requestId);
-		String requestOrder = this.getHeader("request-order");
+		this.httpHeaders.put(CoreStarterConstant.REQUEST_ID, requestId);
+		String requestOrder = this.getHeader(CoreStarterConstant.REQUEST_ORDER);
 		try {
 			requestOrder = String.valueOf(Integer.valueOf(requestOrder) + 1);
-		} catch (Exception var6) {
+		} catch (Exception e) {
 			requestOrder = "1";
 		}
-		this.httpHeaders.put("request-order", requestOrder);
+		this.httpHeaders.put(CoreStarterConstant.REQUEST_ORDER, requestOrder);
 	}
 
 	/**
@@ -201,5 +192,5 @@ public class CurrentContext implements Serializable {
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
-	
+
 }

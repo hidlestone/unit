@@ -23,6 +23,12 @@ public class Permission extends BaseEntity {
 	private Long id;
 
 	/**
+	 * 微服务编码，即微服务名称缩写
+	 */
+	@TableField(value = "service_code")
+	private String serviceCode;
+
+	/**
 	 * 权限编码
 	 */
 	@TableField(value = "permission_code")

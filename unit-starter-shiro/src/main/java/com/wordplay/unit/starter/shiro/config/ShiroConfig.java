@@ -9,7 +9,7 @@ import com.wordplay.unit.starter.shiro.custom.JWTSubjectFactory;
 import com.wordplay.unit.starter.shiro.filter.JWTShiroFilter;
 import com.wordplay.unit.starter.shiro.model.ShiroRealm;
 import com.wordplay.unit.starter.shiro.util.JWTUtil;
-import com.wordplay.unit.starter.sysparam.service.impl.PlatformSysParamUtil;
+import com.wordplay.unit.starter.sysparam.util.SysParamUtil;
 import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.AllSuccessfulStrategy;
 import org.apache.shiro.authc.pam.AtLeastOneSuccessfulStrategy;
@@ -64,20 +64,20 @@ public class ShiroConfig {
 
 	private RedisUtil redisUtil;
 	private JWTUtil jwtUtil;
-	private PlatformSysParamUtil platformSysParamUtil;
+	private SysParamUtil sysParamUtil;
 
-	public ShiroConfig(PlatformSysParamUtil platformSysParamUtil, RedisUtil redisUtil, JWTUtil jwtUtil) {
-		this.platformSysParamUtil = platformSysParamUtil;
+	public ShiroConfig(SysParamUtil sysParamUtil, RedisUtil redisUtil, JWTUtil jwtUtil) {
+		this.sysParamUtil = sysParamUtil;
 		this.redisUtil = redisUtil;
 		this.jwtUtil = jwtUtil;
 		// 从缓存中获取配置参数
-		Map<String, String> sysItemMap = platformSysParamUtil.getSysParamGroupItemMap(ShiroStarterConstant.SYS_PARAM_GROUP).getData();
-		LOGIN_URL = platformSysParamUtil.mapGet(sysItemMap, "LOGIN_URL");
-		SUCCESS_URL = platformSysParamUtil.mapGet(sysItemMap, "SUCCESS_URL");
-		UNAUTHORIZED_URL = platformSysParamUtil.mapGet(sysItemMap, "UNAUTHORIZED_URL");
-		REMEMBER_ME_COOKIE_MAX_AGE = Integer.valueOf(platformSysParamUtil.mapGet(sysItemMap, "REMEMBER_ME_COOKIE_MAX_AGE"));
-		FILTER_CHAIN_DEFINITION = platformSysParamUtil.mapGet(sysItemMap, "FILTER_CHAIN_DEFINITION");
-		COOKIE_CIPHER_KEY = platformSysParamUtil.mapGet(sysItemMap, "COOKIE_CIPHER_KEY");
+		Map<String, String> sysItemMap = sysParamUtil.getSysParamGroupItemMap(ShiroStarterConstant.SYS_PARAM_GROUP).getData();
+		LOGIN_URL = sysParamUtil.mapGet(sysItemMap, "LOGIN_URL");
+		SUCCESS_URL = sysParamUtil.mapGet(sysItemMap, "SUCCESS_URL");
+		UNAUTHORIZED_URL = sysParamUtil.mapGet(sysItemMap, "UNAUTHORIZED_URL");
+		REMEMBER_ME_COOKIE_MAX_AGE = Integer.valueOf(sysParamUtil.mapGet(sysItemMap, "REMEMBER_ME_COOKIE_MAX_AGE"));
+		FILTER_CHAIN_DEFINITION = sysParamUtil.mapGet(sysItemMap, "FILTER_CHAIN_DEFINITION");
+		COOKIE_CIPHER_KEY = sysParamUtil.mapGet(sysItemMap, "COOKIE_CIPHER_KEY");
 		LOGGER.info("SHIRO CONFIG : " + JSON.toJSONString(sysItemMap));
 	}
 
@@ -219,7 +219,7 @@ public class ShiroConfig {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		// 添加自己的过滤器取名为jwt
 		Map<String, Filter> filterMap = new HashMap<>(16);
-		filterMap.put("jwt", new JWTShiroFilter(platformSysParamUtil, redisUtil, jwtUtil));
+		filterMap.put("jwt", new JWTShiroFilter(sysParamUtil, redisUtil, jwtUtil));
 		shiroFilterFactoryBean.setFilters(filterMap);
 		// 配置管理器
 		shiroFilterFactoryBean.setSecurityManager(securityManager);

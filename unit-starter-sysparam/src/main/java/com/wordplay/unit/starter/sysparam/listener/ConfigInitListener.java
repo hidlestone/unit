@@ -1,7 +1,7 @@
 package com.wordplay.unit.starter.sysparam.listener;
 
 import com.wordplay.unit.starter.api.response.ResponseResult;
-import com.wordplay.unit.starter.sysparam.service.impl.PlatformSysParamUtil;
+import com.wordplay.unit.starter.sysparam.util.SysParamUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ public class ConfigInitListener implements ApplicationListener<ApplicationStarte
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConfigInitListener.class);
 
 	@Autowired
-	private PlatformSysParamUtil platformSysParamUtil;
+	private SysParamUtil sysParamUtil;
 
 	@Override
 	public void onApplicationEvent(ApplicationStartedEvent event) {
-		ResponseResult responseResult = platformSysParamUtil.refreshSysParamCache();
+		ResponseResult responseResult = sysParamUtil.refreshSysParamCache();
 		LOGGER.info(responseResult.toString());
 		LOGGER.info("init system config to cache.");
 	}

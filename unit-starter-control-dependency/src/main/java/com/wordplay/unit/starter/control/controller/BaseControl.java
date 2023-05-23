@@ -20,17 +20,17 @@ public class BaseControl {
 	 *
 	 * @return
 	 */
-	protected boolean isAdmin() {
-		return Arrays.asList(this.getRoleCodes().split(",")).contains("admin");
-	}
+//	protected boolean isAdmin() {
+//		return Arrays.asList(this.getRoleCodes().split(",")).contains("admin");
+//	}
 
-	protected String getRoleCodes() {
-		return this.getUserAuthInfo().getRoleCodes();
-	}
-
-	protected UserAuthInfo getUserAuthInfo() {
-		return CurrentContextHelper.getUserAuthInfo() != null ? CurrentContextHelper.getUserAuthInfo() : new UserAuthInfo();
-	}
+//	protected String getRoleCodes() {
+//		return this.getUserAuthInfo().getRoleCodes();
+//	}
+//
+//	protected UserAuthInfo getUserAuthInfo() {
+//		return CurrentContextHelper.getUserAuthInfo() != null ? CurrentContextHelper.getUserAuthInfo() : new UserAuthInfo();
+//	}
 
 
 }

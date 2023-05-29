@@ -145,11 +145,11 @@ public class CurrentContextHelper {
 	 *
 	 * @return 模块编码
 	 */
-	public static String getModuleCode() {
+	public static String getServiceCode() {
 		if (get() == null) {
 			return null;
 		} else {
-			String moduleCode = get().getHeader(CoreStarterConstant.MODULE_CODE);
+			String moduleCode = get().getHeader(CoreStarterConstant.SERVICE_CODE);
 			return moduleCode;
 		}
 	}

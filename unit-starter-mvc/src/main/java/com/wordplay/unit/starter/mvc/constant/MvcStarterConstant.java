@@ -6,6 +6,15 @@ package com.wordplay.unit.starter.mvc.constant;
  */
 public class MvcStarterConstant {
 
+	// 签名
+	public final static String SIGN = "sign";
+	// 加密请求体
+	public final static String ENCRYPT_CODE = "encrypt-code";
+	// nonce(Number once)校验
+	public final static String NONCE = "nonce";
+	// 请求时间
+	public final static String STIME = "stime";
+	
 	public final static String XSS_ENABLE = "XSS_ENABLE";
 	public final static String EXCLUDE_PATTERN = "EXCLUDE_PATTERN";
 	public final static String INCLUDE_PATTERN = "INCLUDE_PATTERN";

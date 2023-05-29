@@ -173,11 +173,11 @@ public class RepeatSubmitFilter implements Filter {
 
 		// 校验URI是否是需要校验签名的请求
 		if (this.checkUriSignature(request.getRequestURI())) {
-			if (StringUtils.isBlank(request.getHeader(CoreStarterConstant.STIME))) {
+			if (StringUtils.isBlank(request.getHeader(MvcStarterConstant.STIME))) {
 				throw new RuntimeException("request header stime can not be empty.");
 			}
 			// 请求时间
-			long stime = Long.parseLong(request.getHeader(CoreStarterConstant.STIME));
+			long stime = Long.parseLong(request.getHeader(MvcStarterConstant.STIME));
 			// 获取请求超时时间
 			Integer timeout = null != APPLICATION_SIGNATURE_STIME_TIMEOUT ? APPLICATION_SIGNATURE_STIME_TIMEOUT : APPLICATION_DEFAULT_STIME_TIMEOUT;
 			Long currentTime = System.currentTimeMillis();
@@ -186,7 +186,7 @@ public class RepeatSubmitFilter implements Filter {
 				throw new RuntimeException("stime timeout.");
 			}
 			// nonce(Number once)校验
-			String nonce = request.getHeader(CoreStarterConstant.NONCE);
+			String nonce = request.getHeader(MvcStarterConstant.NONCE);
 			if (APPLICATION_SIGNATURE_REPEAT_CHECK_ENABLE) {
 				// 校验是否重复提交
 				this.checkRepeatedRequest(request, nonce);
@@ -205,12 +205,12 @@ public class RepeatSubmitFilter implements Filter {
 	 */
 	private void checkParamBeModified(HttpServletRequest request, String nonce) {
 		// 获取请求头中的签名：sign，前端生成的签名
-		String sign = request.getHeader(CoreStarterConstant.SIGN);
+		String sign = request.getHeader(MvcStarterConstant.SIGN);
 		if (StringUtils.isBlank(sign)) {
 			throw new RuntimeException("sign can not be empty.");
 		}
 		// 获取AES密文
-		String encryptCode = request.getHeader(CoreStarterConstant.ENCRYPT_CODE);
+		String encryptCode = request.getHeader(MvcStarterConstant.ENCRYPT_CODE);
 		LOGGER.error("encrypt-code : {}", encryptCode);
 		if (StringUtils.isBlank(encryptCode)) {
 			throw new RuntimeException("encrypt-code can not be empty.");

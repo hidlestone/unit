@@ -145,6 +145,11 @@
             <!-- platform-starter start -->
             <dependency>
                 <groupId>com.wordplay.unit</groupId>
+                <artifactId>unit-starter-core</artifactId>
+                <version>${unit.starters.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wordplay.unit</groupId>
                 <artifactId>unit-starter-activiti</artifactId>
                 <version>${unit.starters.version}</version>
             </dependency>

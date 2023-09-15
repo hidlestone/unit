@@ -16,15 +16,17 @@
     <description>unit-starters</description>
 
     <modules>
+        <!-- mybatis-plus 基础配置 -->
         <module>../unit-starter-data-mp</module>
+        <!-- 基础API依赖 -->
         <module>../unit-starter-api-dependency</module>
+        <!-- 系统参数模块 -->
         <module>../unit-starter-sysparam</module>
         <module>../unit-starter-util</module>
         <module>../unit-starter-cache-simple</module>
         <module>../unit-starter-cache-ehcache</module>
         <module>../unit-starter-cache-redis</module>
         <module>../unit-starter-rbac</module>
-        <module>../unit-starter-data-jpa</module>
         <module>../unit-starter-i18n</module>
         <module>../unit-starter-file</module>
         <module>../unit-starter-easy-es</module>
